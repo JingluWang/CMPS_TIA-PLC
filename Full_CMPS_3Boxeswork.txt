@@ -1,0 +1,139 @@
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #s1up[#num] := #s1up_origin[#num] + #s1up_slope[#num] * (65000 - "DSDf09upS1"); // 
+    #s2up[#num] := #s2up_origin[#num] + #s2up_slope[#num] * (65000 - "ds_s2u");
+    #s3up[#num] := #s3up_origin[#num] + #s3up_slope[#num] * (65000 - "ds_s3u");
+    // DS: 03up
+(*    #s4up[#num] := #s4up_origin[#num] + #s4up_slope[#num] * (65000 - "DSDf03upS1");
+    #s5up[#num] := #s5up_origin[#num] + #s5up_slope[#num] * (65000 - "ds_s5u");
+    #s6up[#num] := #s6up_origin[#num] + #s6up_slope[#num] * (65000 - "ds_s6u");
+    // DS: 12down
+    #s1dn[#num] := #s1dn_origin[#num] + #s1dn_slope[#num] * (65000 - "ds_s1d");
+    #s2dn[#num] := #s2dn_origin[#num] + #s2dn_slope[#num] * (65000 - "ds_s2d");
+    #s3dn[#num] := #s3dn_origin[#num] + #s3dn_slope[#num] * (65000 - "ds_s3d");
+    // DS: 06down
+    #s4dn[#num] := #s4dn_origin[#num] + #s4dn_slope[#num] * (65000 - "ds_s4d");
+    #s5dn[#num] := #s5dn_origin[#num] + #s5dn_slope[#num] * (65000 - "ds_s5d");
+    #s6dn[#num] := #s6dn_origin[#num] + #s6dn_slope[#num] * (65000 - "ds_s6d"); *)
+    
+END_FOR;
+
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #vector09up_a[#num] := #s2up[#num] - #s1up[#num];
+    #vector09up_b[#num] := #s3up[#num] - #s1up[#num];
+(*    // DS: 03up
+    #vector03up_a[#num] := #s5up[#num] - #s4up[#num];
+    #vector03up_b[#num] := #s6up[#num] - #s4up[#num];
+    // DS: 12down
+    #vector12dn_a[#num] := #s2dn[#num] - #s1dn[#num];
+    #vector12dn_b[#num] := #s3dn[#num] - #s1dn[#num];
+    // DS: 06down
+    #vector06dn_a[#num] := #s5dn[#num] - #s4dn[#num];
+    #vector06dn_b[#num] := #s6dn[#num] - #s4dn[#num];
+    *)
+END_FOR;
+
+// DS: 09up
+#vector_norm_09up[0] := (#vector09up_b[1] * #vector09up_a[2]) - (#vector09up_a[1] * #vector09up_b[2]);
+#vector_norm_09up[1] := (#vector09up_b[2] * #vector09up_a[0]) - (#vector09up_a[2] * #vector09up_b[0]);
+#vector_norm_09up[2] := (#vector09up_b[0] * #vector09up_a[1]) - (#vector09up_a[0] * #vector09up_b[1]);
+#unitlength_09up := SQRT(SQR(#vector_norm_09up[0]) + SQR(#vector_norm_09up[1]) + SQR(#vector_norm_09up[2]));
+(* // DS: 03up
+#vector_norm_03up[0] := (#vector03up_b[1] * #vector03up_a[2]) - (#vector03up_a[1] * #vector03up_b[2]);
+#vector_norm_03up[1] := (#vector03up_b[2] * #vector03up_a[0]) - (#vector03up_a[2] * #vector03up_b[0]);
+#vector_norm_03up[2] := (#vector03up_b[0] * #vector03up_a[1]) - (#vector03up_a[0] * #vector03up_b[1]);
+#unitlength_03up := SQRT(SQR(#vector_norm_03up[0]) + SQR(#vector_norm_03up[1]) + SQR(#vector_norm_03up[2]));
+// DS: 12down
+#vector_norm_12dn[0] := (#vector12dn_b[1] * #vector12dn_a[2]) - (#vector12dn_a[1] * #vector12dn_b[2]);
+#vector_norm_12dn[1] := (#vector12dn_b[2] * #vector12dn_a[0]) - (#vector12dn_a[2] * #vector12dn_b[0]);
+#vector_norm_12dn[2] := (#vector12dn_b[0] * #vector12dn_a[1]) - (#vector12dn_a[0] * #vector12dn_b[1]);
+#unitlength_12dn := SQRT(SQR(#vector_norm_12dn[0]) + SQR(#vector_norm_12dn[1]) + SQR(#vector_norm_12dn[2]));
+// DS: 06down
+#vector_norm_06dn[0] := (#vector06dn_b[1] * #vector06dn_a[2]) - (#vector06dn_a[1] * #vector06dn_b[2]);
+#vector_norm_06dn[1] := (#vector06dn_b[2] * #vector06dn_a[0]) - (#vector06dn_a[2] * #vector06dn_b[0]);
+#vector_norm_06dn[2] := (#vector06dn_b[0] * #vector06dn_a[1]) - (#vector06dn_a[0] * #vector06dn_b[1]);
+#unitlength_06dn := SQRT(SQR(#vector_norm_06dn[0]) + SQR(#vector_norm_06dn[1]) + SQR(#vector_norm_06dn[2])); *)
+
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #vector_norm_09up[#num] := #vector_norm_09up[#num] / #unitlength_09up;
+(*    // DS: 03up
+    #vector_norm_03up[#num] := #vector_norm_03up[#num] / #unitlength_03up;
+    // DS: 12down
+    #vector_norm_12dn[#num] := #vector_norm_12dn[#num] / #unitlength_12dn;
+    // DS: 06down
+    #vector_norm_06dn[#num] := #vector_norm_06dn[#num] / #unitlength_06dn; *)
+END_FOR;
+
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #plane_eqn_09up[#num] := #s1up[#num];
+(*    // DS: 03up
+    #plane_eqn_03up[#num] := #s4up[#num];
+    // DS: 12down
+    #plane_eqn_12dn[#num] := #s1dn[#num];
+    // DS: 06down
+    #plane_eqn_06dn[#num] := #s4dn[#num]; *)
+END_FOR;
+
+// DS: 09up
+#plane_eqn_09up[3] := (#vector_norm_09up[0] * #s1up[0]) + (#vector_norm_09up[1] * #s1up[1]) + (#vector_norm_09up[2] * #s1up[2]);
+#plate_t_09up := ((#vector_norm_09up[0] * (#axis_origin[0] - #s1up[0])) + (#vector_norm_09up[1] * (#axis_origin[1] - #s1up[1])) + (#vector_norm_09up[2] * (#axis_origin[2] - #s1up[2]))) / (-1 * (#vector_norm_09up[0] * #vector_axis[0] + #vector_norm_09up[1] * #vector_axis[1] + #vector_norm_09up[2] * #vector_axis[2]));
+(* // DS: 03up
+#plane_eqn_03up[3] := (#vector_norm_03up[0] * #s4up[0]) + (#vector_norm_03up[1] * #s4up[1]) + (#vector_norm_03up[2] * #s4up[2]);
+#plate_t_03up := ((#vector_norm_03up[0] * (#axis_origin[0] - #s4up[0])) + (#vector_norm_03up[1] * (#axis_origin[1] - #s4up[1])) + (#vector_norm_03up[2] * (#axis_origin[2] - #s4up[2]))) / (-1 * (#vector_norm_03up[0] * #vector_axis[0] + #vector_norm_03up[1] * #vector_axis[1] + #vector_norm_03up[2] * #vector_axis[2]));
+// DS: 12down
+#plane_eqn_12dn[3] := (#vector_norm_12dn[0] * #s1dn[0]) + (#vector_norm_12dn[1] * #s1dn[1]) + (#vector_norm_12dn[2] * #s1dn[2]);
+#plate_t_12dn := ((#vector_norm_12dn[0] * (#axis_origin[0] - #s1dn[0])) + (#vector_norm_12dn[1] * (#axis_origin[1] - #s1dn[1])) + (#vector_norm_12dn[2] * (#axis_origin[2] - #s1dn[2]))) / (-1 * (#vector_norm_12dn[0] * #vector_axis[0] + #vector_norm_12dn[1] * #vector_axis[1] + #vector_norm_12dn[2] * #vector_axis[2]));
+// DS: 06down
+#plane_eqn_06dn[3] := (#vector_norm_06dn[0] * #s4dn[0]) + (#vector_norm_06dn[1] * #s4dn[1]) + (#vector_norm_06dn[2] * #s4dn[2]);
+#plate_t_06dn := ((#vector_norm_06dn[0] * (#axis_origin[0] - #s4dn[0])) + (#vector_norm_06dn[1] * (#axis_origin[1] - #s4dn[1])) + (#vector_norm_06dn[2] * (#axis_origin[2] - #s4dn[2]))) / (-1 * (#vector_norm_06dn[0] * #vector_axis[0] + #vector_norm_06dn[1] * #vector_axis[1] + #vector_norm_06dn[2] * #vector_axis[2]));
+*)
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #plate_center_09up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_09up;
+(*    // DS: 03up
+    #plate_center_03up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_03up;
+    // DS: 12down
+    #plate_center_12dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_12dn;
+    // DS: 06down
+    #plate_center_06dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_06dn; *)
+END_FOR;
+
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #coldmass_09up[#num] := #plate_center_09up[#num] + #vector_norm_09up[#num] * #rodlength_09up;
+(*    // DS: 03up
+    #coldmass_03up[#num] := #plate_center_03up[#num] + #vector_norm_03up[#num] * #rodlength_03up;
+    // DS: 12down
+    #coldmass_12dn[#num] := #plate_center_12dn[#num] + #vector_norm_12dn[#num] * #rodlength_12dn;
+    // DS: 06down
+    #coldmass_06dn[#num] := #plate_center_06dn[#num] + #vector_norm_06dn[#num] * #rodlength_06dn; *)
+END_FOR;
+
+
+
+
+
+
+
+        
+        
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
