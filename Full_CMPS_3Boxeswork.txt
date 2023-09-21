@@ -1,139 +1,367 @@
+// -----------------------------------------------------------------------------------------------------
+// -----------------       STEP 1: Locations of the 3 points on the plate         ----------------------
+// -----------------------------------------------------------------------------------------------------
+// - Inputs: 3 distances from each sensor - "DSDf09upS1" (ID6), "DSDf09upS2" (ID13), "DSDf09upS3" (ID20)
+//           origins & slopes of lasers (from the survey group)
+// - Calculate the actual length from sensor head to a point, multiplys by that laser's unit vector
+//   and then adds that to the origin of the laser head to determine point location
+// -----------------------------------------------------------------------------------------------------
 #num := 0;
 FOR #num := 0 TO 2 DO
     // DS: 09up
-    #s1up[#num] := #s1up_origin[#num] + #s1up_slope[#num] * (65000 - "DSDf09upS1"); // 
-    #s2up[#num] := #s2up_origin[#num] + #s2up_slope[#num] * (65000 - "ds_s2u");
-    #s3up[#num] := #s3up_origin[#num] + #s3up_slope[#num] * (65000 - "ds_s3u");
+    #DS09s1up[#num] := #DS09s1up_origin[#num] + #DS09s1up_slope[#num] * (65000 - "DSDf09upS1"); // ID6 (s1up->DS09s1up)
+    #DS09s2up[#num] := #DS09s2up_origin[#num] + #DS09s2up_slope[#num] * (65000 - "DSDf09upS2"); // ID13
+    #DS09s3up[#num] := #DS09s3up_origin[#num] + #DS09s3up_slope[#num] * (65000 - "DSDf09upS3"); // ID20
     // DS: 03up
-(*    #s4up[#num] := #s4up_origin[#num] + #s4up_slope[#num] * (65000 - "DSDf03upS1");
-    #s5up[#num] := #s5up_origin[#num] + #s5up_slope[#num] * (65000 - "ds_s5u");
-    #s6up[#num] := #s6up_origin[#num] + #s6up_slope[#num] * (65000 - "ds_s6u");
+    #DS03s1up[#num] := #DS03s1up_origin[#num] + #DS03s1up_slope[#num] * (65000 - "DSDf03upS1"); // ID27 (s4up->DS03s1up)
+    #DS03s2up[#num] := #DS03s2up_origin[#num] + #DS03s2up_slope[#num] * (65000 - "DSDf03upS2"); // ID34
+    #DS03s3up[#num] := #DS03s3up_origin[#num] + #DS03s3up_slope[#num] * (65000 - "DSDf03upS3"); // ID41
     // DS: 12down
-    #s1dn[#num] := #s1dn_origin[#num] + #s1dn_slope[#num] * (65000 - "ds_s1d");
-    #s2dn[#num] := #s2dn_origin[#num] + #s2dn_slope[#num] * (65000 - "ds_s2d");
-    #s3dn[#num] := #s3dn_origin[#num] + #s3dn_slope[#num] * (65000 - "ds_s3d");
+    #DS12s1dn[#num] := #DS12s1dn_origin[#num] + #DS12s1dn_slope[#num] * (65000 - "DSDf12dnS1"); // ID50 (s1dn->DS12s1dn)
+    #DS12s2dn[#num] := #DS12s2dn_origin[#num] + #DS12s2dn_slope[#num] * (65000 - "DSDf12dnS2"); // ID57
+    #DS12s3dn[#num] := #DS12s3dn_origin[#num] + #DS12s3dn_slope[#num] * (65000 - "DSDf12dnS3"); // ID71
     // DS: 06down
-    #s4dn[#num] := #s4dn_origin[#num] + #s4dn_slope[#num] * (65000 - "ds_s4d");
-    #s5dn[#num] := #s5dn_origin[#num] + #s5dn_slope[#num] * (65000 - "ds_s5d");
-    #s6dn[#num] := #s6dn_origin[#num] + #s6dn_slope[#num] * (65000 - "ds_s6d"); *)
+    #DS06s1dn[#num] := #DS06s1dn_origin[#num] + #DS06s1dn_slope[#num] * (65000 - "DSDf06dnS1"); // ID78 (s4dn->DS06s1dn)
+    #DS06s2dn[#num] := #DS06s2dn_origin[#num] + #DS06s2dn_slope[#num] * (65000 - "DSDf06dnS2"); // ID85
+    #DS06s3dn[#num] := #DS06s3dn_origin[#num] + #DS06s3dn_slope[#num] * (65000 - "DSDf06dnS3"); // ID92
+
+    // TSu: 12up
+    #TSu12s1up[#num] := #TSu12s1up_origin[#num] + #TSu12s1up_slope[#num] * (65000 - "TSuDF12upS1"); // ID99 
+    #TSu12s2up[#num] := #TSu12s2up_origin[#num] + #TSu12s2up_slope[#num] * (65000 - "TSuDF12upS2"); // ID106
+    #TSu12s3up[#num] := #TSu12s3up_origin[#num] + #TSu12s3up_slope[#num] * (65000 - "TSuDF12upS3"); // ID113
+    // TSu: 06up
+    #TSu06s1up[#num] := #TSu06s1up_origin[#num] + #TSu06s1up_slope[#num] * (65000 - "TSuDF06upS1"); // ID120 
+    #TSu06s2up[#num] := #TSu06s2up_origin[#num] + #TSu06s2up_slope[#num] * (65000 - "TSuDF06upS2"); // ID127
+    #TSu06s3up[#num] := #TSu06s3up_origin[#num] + #TSu06s3up_slope[#num] * (65000 - "TSuDF06upS3"); // ID134
+    // TSu: 12down
+    #TSu12s1dn[#num] := #TSu12s1dn_origin[#num] + #TSu12s1dn_slope[#num] * (65000 - "TSuDF12dnS1"); // ID143
+    #TSu12s2dn[#num] := #TSu12s2dn_origin[#num] + #TSu12s2dn_slope[#num] * (65000 - "TSuDF12dnS2"); // ID150
+    #TSu12s3dn[#num] := #TSu12s3dn_origin[#num] + #TSu12s3dn_slope[#num] * (65000 - "TSuDF12dnS3"); // ID157
+    // TSu: 06down
+    #TSu06s1dn[#num] := #TSu06s1dn_origin[#num] + #TSu06s1dn_slope[#num] * (65000 - "TSuDF06dnS1"); // ID164 
+    #TSu06s2dn[#num] := #TSu06s2dn_origin[#num] + #TSu06s2dn_slope[#num] * (65000 - "TSuDF06dnS2"); // ID171
+    #TSu06s3dn[#num] := #TSu06s3dn_origin[#num] + #TSu06s3dn_slope[#num] * (65000 - "TSuDF06dnS3"); // ID178
     
+    // TSd: 12up
+    #TSd12s1up[#num] := #TSd12s1up_origin[#num] + #TSd12s1up_slope[#num] * (65000 - "TSdDF12upS1"); // ID187 
+    #TSd12s2up[#num] := #TSd12s2up_origin[#num] + #TSd12s2up_slope[#num] * (65000 - "TSdDF12upS2"); // ID194
+    #TSd12s3up[#num] := #TSd12s3up_origin[#num] + #TSd12s3up_slope[#num] * (65000 - "TSdDF12upS3"); // ID201
+    // TSd: 06up
+    #TSd06s1up[#num] := #TSd06s1up_origin[#num] + #TSd06s1up_slope[#num] * (65000 - "TSdDF06upS1"); // ID208 
+    #TSd06s2up[#num] := #TSd06s2up_origin[#num] + #TSd06s2up_slope[#num] * (65000 - "TSdDF06upS2"); // ID215
+    #TSd06s3up[#num] := #TSd06s3up_origin[#num] + #TSd06s3up_slope[#num] * (65000 - "TSdDF06upS3"); // ID222
+    // TSd: 12down
+    #TSd12s1dn[#num] := #TSd12s1dn_origin[#num] + #TSd12s1dn_slope[#num] * (65000 - "TSdDF12dnS1"); // ID231
+    #TSd12s2dn[#num] := #TSd12s2dn_origin[#num] + #TSd12s2dn_slope[#num] * (65000 - "TSdDF12dnS2"); // ID238
+    #TSd12s3dn[#num] := #TSd12s3dn_origin[#num] + #TSd12s3dn_slope[#num] * (65000 - "TSdDF12dnS3"); // ID245
+    // TSd: 06down
+    #TSd06s1dn[#num] := #TSd06s1dn_origin[#num] + #TSd06s1dn_slope[#num] * (65000 - "TSdDF06dnS1"); // ID252 
+    #TSd06s2dn[#num] := #TSd06s2dn_origin[#num] + #TSd06s2dn_slope[#num] * (65000 - "TSdDF06dnS2"); // ID259
+    #TSd06s3dn[#num] := #TSd06s3dn_origin[#num] + #TSd06s3dn_slope[#num] * (65000 - "TSdDF06dnS3"); // ID266
 END_FOR;
 
+
+// -----------------------------------------------------------------------------------------
+// ------------------        STEP 2: Normal vector of the plate        ---------------------
+// -----------------------------------------------------------------------------------------
+// - Data from above: points one and two for vector a, and points one and three for vector b
+// - Cross two vectors in the plane of the plate
+// -----------------------------------------------------------------------------------------
 #num := 0;
 FOR #num := 0 TO 2 DO
     // DS: 09up
-    #vector09up_a[#num] := #s2up[#num] - #s1up[#num];
-    #vector09up_b[#num] := #s3up[#num] - #s1up[#num];
-(*    // DS: 03up
-    #vector03up_a[#num] := #s5up[#num] - #s4up[#num];
-    #vector03up_b[#num] := #s6up[#num] - #s4up[#num];
+    #vectorDS09up_a[#num] := #DS09s2up[#num] - #DS09s1up[#num];
+    #vectorDS09up_b[#num] := #DS09s3up[#num] - #DS09s1up[#num];
+    // DS: 03up
+    #vectorDS03up_a[#num] := #DS03s2up[#num] - #DS03s1up[#num];
+    #vectorDS03up_b[#num] := #DS03s3up[#num] - #DS03s1up[#num];
     // DS: 12down
-    #vector12dn_a[#num] := #s2dn[#num] - #s1dn[#num];
-    #vector12dn_b[#num] := #s3dn[#num] - #s1dn[#num];
+    #vectorDS12dn_a[#num] := #DS12s2dn[#num] - #DS12s1dn[#num];
+    #vectorDS12dn_b[#num] := #DS12s3dn[#num] - #DS12s1dn[#num];
     // DS: 06down
-    #vector06dn_a[#num] := #s5dn[#num] - #s4dn[#num];
-    #vector06dn_b[#num] := #s6dn[#num] - #s4dn[#num];
-    *)
+    #vectorDS06dn_a[#num] := #DS06s2dn[#num] - #DS06s1dn[#num];
+    #vectorDS06dn_b[#num] := #DS06s3dn[#num] - #DS06s1dn[#num];
+    
+    // TSu: 12up 
+    #vectorTSu12up_a[#num] := #TSu12s2up[#num] - #TSu12s1up[#num];
+    #vectorTSu12up_b[#num] := #TSu12s3up[#num] - #TSu12s1up[#num];
+    // TSu: 06up
+    #vectorTSu12up_a[#num] := #TSu12s2up[#num] - #TSu06s1up[#num];
+    #vectorTSu12up_b[#num] := #TSu12s3up[#num] - #TSu12s1up[#num];
+    // TSu: 12down
+    #vectorTSu12dn_a[#num] := #TSu12s2dn[#num] - #TSu12s1dn[#num];
+    #vectorTSu12dn_b[#num] := #TSu12s3dn[#num] - #TSu12s1dn[#num];
+    // TSu: 06down
+    #vectorTSu06dn_a[#num] := #TSu06s2dn[#num] - #TSu06s1dn[#num];
+    #vectorTSu06dn_b[#num] := #TSu06s3dn[#num] - #TSu06s1dn[#num];
+    
+    // TSd: 12up 
+    #vectorTSd12up_a[#num] := #TSd12s2up[#num] - #TSd12s1up[#num];
+    #vectorTSd12up_b[#num] := #TSd12s3up[#num] - #TSd12s1up[#num];
+    // TSd: 06up
+    #vectorTSd12up_a[#num] := #TSd12s2up[#num] - #TSd06s1up[#num];
+    #vectorTSd12up_b[#num] := #TSd12s3up[#num] - #TSd12s1up[#num];
+    // TSd: 12down
+    #vectorTSd12dn_a[#num] := #TSd12s2dn[#num] - #TSd12s1dn[#num];
+    #vectorTSd12dn_b[#num] := #TSd12s3dn[#num] - #TSd12s1dn[#num];
+    // TSd: 06down
+    #vectorTSd06dn_a[#num] := #TSd06s2dn[#num] - #TSd06s1dn[#num];
+    #vectorTSd06dn_b[#num] := #TSd06s3dn[#num] - #TSd06s1dn[#num];
 END_FOR;
 
 // DS: 09up
-#vector_norm_09up[0] := (#vector09up_b[1] * #vector09up_a[2]) - (#vector09up_a[1] * #vector09up_b[2]);
-#vector_norm_09up[1] := (#vector09up_b[2] * #vector09up_a[0]) - (#vector09up_a[2] * #vector09up_b[0]);
-#vector_norm_09up[2] := (#vector09up_b[0] * #vector09up_a[1]) - (#vector09up_a[0] * #vector09up_b[1]);
-#unitlength_09up := SQRT(SQR(#vector_norm_09up[0]) + SQR(#vector_norm_09up[1]) + SQR(#vector_norm_09up[2]));
-(* // DS: 03up
-#vector_norm_03up[0] := (#vector03up_b[1] * #vector03up_a[2]) - (#vector03up_a[1] * #vector03up_b[2]);
-#vector_norm_03up[1] := (#vector03up_b[2] * #vector03up_a[0]) - (#vector03up_a[2] * #vector03up_b[0]);
-#vector_norm_03up[2] := (#vector03up_b[0] * #vector03up_a[1]) - (#vector03up_a[0] * #vector03up_b[1]);
-#unitlength_03up := SQRT(SQR(#vector_norm_03up[0]) + SQR(#vector_norm_03up[1]) + SQR(#vector_norm_03up[2]));
+#vector_norm_DS09up[0] := (#vectorDS09up_b[1] * #vectorDS09up_a[2]) - (#vectorDS09up_a[1] * #vectorDS09up_b[2]);
+#vector_norm_DS09up[1] := (#vectorDS09up_b[2] * #vectorDS09up_a[0]) - (#vectorDS09up_a[2] * #vectorDS09up_b[0]);
+#vector_norm_DS09up[2] := (#vectorDS09up_b[0] * #vectorDS09up_a[1]) - (#vectorDS09up_a[0] * #vectorDS09up_b[1]);
+#unitlength_DS09up := SQRT(SQR(#vector_norm_DS09up[0]) + SQR(#vector_norm_DS09up[1]) + SQR(#vector_norm_DS09up[2]));
+// DS: 03up
+#vector_norm_DS03up[0] := (#vectorDS03up_b[1] * #vectorDS03up_a[2]) - (#vectorDS03up_a[1] * #vectorDS03up_b[2]);
+#vector_norm_DS03up[1] := (#vectorDS03up_b[2] * #vectorDS03up_a[0]) - (#vectorDS03up_a[2] * #vectorDS03up_b[0]);
+#vector_norm_DS03up[2] := (#vectorDS03up_b[0] * #vectorDS03up_a[1]) - (#vectorDS03up_a[0] * #vectorDS03up_b[1]);
+#unitlength_DS03up := SQRT(SQR(#vector_norm_DS03up[0]) + SQR(#vector_norm_DS03up[1]) + SQR(#vector_norm_DS03up[2]));
 // DS: 12down
-#vector_norm_12dn[0] := (#vector12dn_b[1] * #vector12dn_a[2]) - (#vector12dn_a[1] * #vector12dn_b[2]);
-#vector_norm_12dn[1] := (#vector12dn_b[2] * #vector12dn_a[0]) - (#vector12dn_a[2] * #vector12dn_b[0]);
-#vector_norm_12dn[2] := (#vector12dn_b[0] * #vector12dn_a[1]) - (#vector12dn_a[0] * #vector12dn_b[1]);
-#unitlength_12dn := SQRT(SQR(#vector_norm_12dn[0]) + SQR(#vector_norm_12dn[1]) + SQR(#vector_norm_12dn[2]));
+#vector_norm_DS12dn[0] := (#vectorDS12dn_b[1] * #vectorDS12dn_a[2]) - (#vectorDS12dn_a[1] * #vectorDS12dn_b[2]);
+#vector_norm_DS12dn[1] := (#vectorDS12dn_b[2] * #vectorDS12dn_a[0]) - (#vectorDS12dn_a[2] * #vectorDS12dn_b[0]);
+#vector_norm_DS12dn[2] := (#vectorDS12dn_b[0] * #vectorDS12dn_a[1]) - (#vectorDS12dn_a[0] * #vectorDS12dn_b[1]);
+#unitlength_DS12dn := SQRT(SQR(#vector_norm_DS12dn[0]) + SQR(#vector_norm_DS12dn[1]) + SQR(#vector_norm_DS12dn[2]));
 // DS: 06down
-#vector_norm_06dn[0] := (#vector06dn_b[1] * #vector06dn_a[2]) - (#vector06dn_a[1] * #vector06dn_b[2]);
-#vector_norm_06dn[1] := (#vector06dn_b[2] * #vector06dn_a[0]) - (#vector06dn_a[2] * #vector06dn_b[0]);
-#vector_norm_06dn[2] := (#vector06dn_b[0] * #vector06dn_a[1]) - (#vector06dn_a[0] * #vector06dn_b[1]);
-#unitlength_06dn := SQRT(SQR(#vector_norm_06dn[0]) + SQR(#vector_norm_06dn[1]) + SQR(#vector_norm_06dn[2])); *)
+#vector_norm_DS06dn[0] := (#vectorDS06dn_b[1] * #vectorDS06dn_a[2]) - (#vectorDS06dn_a[1] * #vectorDS06dn_b[2]);
+#vector_norm_DS06dn[1] := (#vectorDS06dn_b[2] * #vectorDS06dn_a[0]) - (#vectorDS06dn_a[2] * #vectorDS06dn_b[0]);
+#vector_norm_DS06dn[2] := (#vectorDS06dn_b[0] * #vectorDS06dn_a[1]) - (#vectorDS06dn_a[0] * #vectorDS06dn_b[1]);
+#unitlength_DS06dn := SQRT(SQR(#vector_norm_DS06dn[0]) + SQR(#vector_norm_DS06dn[1]) + SQR(#vector_norm_DS06dn[2]));
 
+
+// TSu: 12up                                                                                                 
+#vector_norm_TSu12up[0] := (#vectorTSu12up_b[1] * #vectorTSu12up_a[2]) - (#vectorTSu12up_a[1] * #vectorTSu12up_b[2]);      
+#vector_norm_TSu12up[1] := (#vectorTSu12up_b[2] * #vectorTSu12up_a[0]) - (#vectorTSu12up_a[2] * #vectorTSu12up_b[0]);      
+#vector_norm_TSu12up[2] := (#vectorTSu12up_b[0] * #vectorTSu12up_a[1]) - (#vectorTSu12up_a[0] * #vectorTSu12up_b[1]);      
+#unitlength_TSu12up := SQRT(SQR(#vector_norm_TSu12up[0]) + SQR(#vector_norm_TSu12up[1]) + SQR(#vector_norm_TSu12up[2]));
+// TSu: 06up                                                                                                 
+#vector_norm_TSu06up[0] := (#vectorTSu06up_b[1] * #vectorTSu06up_a[2]) - (#vectorTSu06up_a[1] * #vectorTSu06up_b[2]);      
+#vector_norm_TSu06up[1] := (#vectorTSu06up_b[2] * #vectorTSu06up_a[0]) - (#vectorTSu06up_a[2] * #vectorTSu06up_b[0]);      
+#vector_norm_TSu06up[2] := (#vectorTSu06up_b[0] * #vectorTSu06up_a[1]) - (#vectorTSu06up_a[0] * #vectorTSu06up_b[1]);      
+#unitlength_TSu06up := SQRT(SQR(#vector_norm_TSu06up[0]) + SQR(#vector_norm_TSu06up[1]) + SQR(#vector_norm_TSu06up[2]));
+// TSu: 12down                                                                                               
+#vector_norm_TSu12dn[0] := (#vectorTSu12dn_b[1] * #vectorTSu12dn_a[2]) - (#vectorTSu12dn_a[1] * #vectorTSu12dn_b[2]);      
+#vector_norm_TSu12dn[1] := (#vectorTSu12dn_b[2] * #vectorTSu12dn_a[0]) - (#vectorTSu12dn_a[2] * #vectorTSu12dn_b[0]);      
+#vector_norm_TSu12dn[2] := (#vectorTSu12dn_b[0] * #vectorTSu12dn_a[1]) - (#vectorTSu12dn_a[0] * #vectorTSu12dn_b[1]);      
+#unitlength_TSu12dn := SQRT(SQR(#vector_norm_TSu12dn[0]) + SQR(#vector_norm_TSu12dn[1]) + SQR(#vector_norm_TSu12dn[2]));
+// TSu: 06down                                                                                               
+#vector_norm_TSu06dn[0] := (#vectorTSu06dn_b[1] * #vectorTSu06dn_a[2]) - (#vectorTSu06dn_a[1] * #vectorTSu06dn_b[2]);      
+#vector_norm_TSu06dn[1] := (#vectorTSu06dn_b[2] * #vectorTSu06dn_a[0]) - (#vectorTSu06dn_a[2] * #vectorTSu06dn_b[0]);      
+#vector_norm_TSu06dn[2] := (#vectorTSu06dn_b[0] * #vectorTSu06dn_a[1]) - (#vectorTSu06dn_a[0] * #vectorTSu06dn_b[1]);      
+#unitlength_TSu06dn := SQRT(SQR(#vector_norm_TSu06dn[0]) + SQR(#vector_norm_TSu06dn[1]) + SQR(#vector_norm_TSu06dn[2]));
+
+
+// TSu: 12up                                                                                                  
+#vector_norm_TSd12up[0] := (#vectorTSd12up_b[1] * #vectorTSd12up_a[2]) - (#vectorTSd12up_a[1] * #vectorTSd12up_b[2]);      
+#vector_norm_TSd12up[1] := (#vectorTSd12up_b[2] * #vectorTSd12up_a[0]) - (#vectorTSd12up_a[2] * #vectorTSd12up_b[0]);      
+#vector_norm_TSd12up[2] := (#vectorTSd12up_b[0] * #vectorTSd12up_a[1]) - (#vectorTSd12up_a[0] * #vectorTSd12up_b[1]);      
+#unitlength_TSd12up := SQRT(SQR(#vector_norm_TSd12up[0]) + SQR(#vector_norm_TSd12up[1]) + SQR(#vector_norm_TSd12up[2]));
+// TSu: 06up                                                                                                  
+#vector_norm_TSd06up[0] := (#vectorTSd06up_b[1] * #vectorTSd06up_a[2]) - (#vectorTSd06up_a[1] * #vectorTSd06up_b[2]);      
+#vector_norm_TSd06up[1] := (#vectorTSd06up_b[2] * #vectorTSd06up_a[0]) - (#vectorTSd06up_a[2] * #vectorTSd06up_b[0]);      
+#vector_norm_TSd06up[2] := (#vectorTSd06up_b[0] * #vectorTSd06up_a[1]) - (#vectorTSd06up_a[0] * #vectorTSd06up_b[1]);      
+#unitlength_TSd06up := SQRT(SQR(#vector_norm_TSd06up[0]) + SQR(#vector_norm_TSd06up[1]) + SQR(#vector_norm_TSd06up[2]));
+// TSu: 12down                                                                                                
+#vector_norm_TSd12dn[0] := (#vectorTSd12dn_b[1] * #vectorTSd12dn_a[2]) - (#vectorTSd12dn_a[1] * #vectorTSd12dn_b[2]);      
+#vector_norm_TSd12dn[1] := (#vectorTSd12dn_b[2] * #vectorTSd12dn_a[0]) - (#vectorTSd12dn_a[2] * #vectorTSd12dn_b[0]);      
+#vector_norm_TSd12dn[2] := (#vectorTSd12dn_b[0] * #vectorTSd12dn_a[1]) - (#vectorTSd12dn_a[0] * #vectorTSd12dn_b[1]);      
+#unitlength_TSd12dn := SQRT(SQR(#vector_norm_TSd12dn[0]) + SQR(#vector_norm_TSd12dn[1]) + SQR(#vector_norm_TSd12dn[2]));
+// TSu: 06down                                                                                                
+#vector_norm_TSd06dn[0] := (#vectorTSd06dn_b[1] * #vectorTSd06dn_a[2]) - (#vectorTSd06dn_a[1] * #vectorTSd06dn_b[2]);      
+#vector_norm_TSd06dn[1] := (#vectorTSd06dn_b[2] * #vectorTSd06dn_a[0]) - (#vectorTSd06dn_a[2] * #vectorTSd06dn_b[0]);      
+#vector_norm_TSd06dn[2] := (#vectorTSd06dn_b[0] * #vectorTSd06dn_a[1]) - (#vectorTSd06dn_a[0] * #vectorTSd06dn_b[1]);      
+#unitlength_TSd06dn := SQRT(SQR(#vector_norm_TSd06dn[0]) + SQR(#vector_norm_TSd06dn[1]) + SQR(#vector_norm_TSd06dn[2]));
+
+
+// --------------------------------------------------
+// ----- STEP 3: Change to a unit normal vector -----
+// --------------------------------------------------
 #num := 0;
 FOR #num := 0 TO 2 DO
     // DS: 09up
-    #vector_norm_09up[#num] := #vector_norm_09up[#num] / #unitlength_09up;
-(*    // DS: 03up
-    #vector_norm_03up[#num] := #vector_norm_03up[#num] / #unitlength_03up;
+    #vector_norm_DS09up[#num] := #vector_norm_DS09up[#num] / #unitlength_DS09up;
+    // DS: 03up
+    #vector_norm_DS03up[#num] := #vector_norm_DS03up[#num] / #unitlength_DS03up;
     // DS: 12down
-    #vector_norm_12dn[#num] := #vector_norm_12dn[#num] / #unitlength_12dn;
+    #vector_norm_DS12dn[#num] := #vector_norm_DS12dn[#num] / #unitlength_DS12dn;
     // DS: 06down
-    #vector_norm_06dn[#num] := #vector_norm_06dn[#num] / #unitlength_06dn; *)
-END_FOR;
-
-#num := 0;
-FOR #num := 0 TO 2 DO
-    // DS: 09up
-    #plane_eqn_09up[#num] := #s1up[#num];
-(*    // DS: 03up
-    #plane_eqn_03up[#num] := #s4up[#num];
-    // DS: 12down
-    #plane_eqn_12dn[#num] := #s1dn[#num];
-    // DS: 06down
-    #plane_eqn_06dn[#num] := #s4dn[#num]; *)
-END_FOR;
-
-// DS: 09up
-#plane_eqn_09up[3] := (#vector_norm_09up[0] * #s1up[0]) + (#vector_norm_09up[1] * #s1up[1]) + (#vector_norm_09up[2] * #s1up[2]);
-#plate_t_09up := ((#vector_norm_09up[0] * (#axis_origin[0] - #s1up[0])) + (#vector_norm_09up[1] * (#axis_origin[1] - #s1up[1])) + (#vector_norm_09up[2] * (#axis_origin[2] - #s1up[2]))) / (-1 * (#vector_norm_09up[0] * #vector_axis[0] + #vector_norm_09up[1] * #vector_axis[1] + #vector_norm_09up[2] * #vector_axis[2]));
-(* // DS: 03up
-#plane_eqn_03up[3] := (#vector_norm_03up[0] * #s4up[0]) + (#vector_norm_03up[1] * #s4up[1]) + (#vector_norm_03up[2] * #s4up[2]);
-#plate_t_03up := ((#vector_norm_03up[0] * (#axis_origin[0] - #s4up[0])) + (#vector_norm_03up[1] * (#axis_origin[1] - #s4up[1])) + (#vector_norm_03up[2] * (#axis_origin[2] - #s4up[2]))) / (-1 * (#vector_norm_03up[0] * #vector_axis[0] + #vector_norm_03up[1] * #vector_axis[1] + #vector_norm_03up[2] * #vector_axis[2]));
-// DS: 12down
-#plane_eqn_12dn[3] := (#vector_norm_12dn[0] * #s1dn[0]) + (#vector_norm_12dn[1] * #s1dn[1]) + (#vector_norm_12dn[2] * #s1dn[2]);
-#plate_t_12dn := ((#vector_norm_12dn[0] * (#axis_origin[0] - #s1dn[0])) + (#vector_norm_12dn[1] * (#axis_origin[1] - #s1dn[1])) + (#vector_norm_12dn[2] * (#axis_origin[2] - #s1dn[2]))) / (-1 * (#vector_norm_12dn[0] * #vector_axis[0] + #vector_norm_12dn[1] * #vector_axis[1] + #vector_norm_12dn[2] * #vector_axis[2]));
-// DS: 06down
-#plane_eqn_06dn[3] := (#vector_norm_06dn[0] * #s4dn[0]) + (#vector_norm_06dn[1] * #s4dn[1]) + (#vector_norm_06dn[2] * #s4dn[2]);
-#plate_t_06dn := ((#vector_norm_06dn[0] * (#axis_origin[0] - #s4dn[0])) + (#vector_norm_06dn[1] * (#axis_origin[1] - #s4dn[1])) + (#vector_norm_06dn[2] * (#axis_origin[2] - #s4dn[2]))) / (-1 * (#vector_norm_06dn[0] * #vector_axis[0] + #vector_norm_06dn[1] * #vector_axis[1] + #vector_norm_06dn[2] * #vector_axis[2]));
-*)
-#num := 0;
-FOR #num := 0 TO 2 DO
-    // DS: 09up
-    #plate_center_09up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_09up;
-(*    // DS: 03up
-    #plate_center_03up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_03up;
-    // DS: 12down
-    #plate_center_12dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_12dn;
-    // DS: 06down
-    #plate_center_06dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_06dn; *)
-END_FOR;
-
-#num := 0;
-FOR #num := 0 TO 2 DO
-    // DS: 09up
-    #coldmass_09up[#num] := #plate_center_09up[#num] + #vector_norm_09up[#num] * #rodlength_09up;
-(*    // DS: 03up
-    #coldmass_03up[#num] := #plate_center_03up[#num] + #vector_norm_03up[#num] * #rodlength_03up;
-    // DS: 12down
-    #coldmass_12dn[#num] := #plate_center_12dn[#num] + #vector_norm_12dn[#num] * #rodlength_12dn;
-    // DS: 06down
-    #coldmass_06dn[#num] := #plate_center_06dn[#num] + #vector_norm_06dn[#num] * #rodlength_06dn; *)
-END_FOR;
-
-
-
-
-
-
-
-        
-        
+    #vector_norm_DS06dn[#num] := #vector_norm_DS06dn[#num] / #unitlength_DS06dn;
  
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    // TSu: 12up
+    #vector_norm_TSu12up[#num] := #vector_norm_TSu12up[#num] / #unitlength_TSu12up;
+    // TSu: 06up
+    #vector_norm_TSu06up[#num] := #vector_norm_TSu06up[#num] / #unitlength_TSu06up;
+    // TSu: 12down
+    #vector_norm_TSu12dn[#num] := #vector_norm_TSu12dn[#num] / #unitlength_TSu12dn;
+    // TSu: 06down
+    #vector_norm_TSu06dn[#num] := #vector_norm_TSu06dn[#num] / #unitlength_TSu06dn;
+
+    // TSd: 12up                                                                   
+    #vector_norm_TSd12up[#num] := #vector_norm_TSd12up[#num] / #unitlength_TSd12up;
+    // TSd: 06up                                                                   
+    #vector_norm_TSd06up[#num] := #vector_norm_TSd06up[#num] / #unitlength_TSd06up;
+    // TSd: 12down                                                                 
+    #vector_norm_TSd12dn[#num] := #vector_norm_TSd12dn[#num] / #unitlength_TSd12dn;
+    // TSd: 06down                                                                 
+    #vector_norm_TSd06dn[#num] := #vector_norm_TSd06dn[#num] / #unitlength_TSd06dn;
+END_FOR;
+
+
+// ----------------------------------------------------------------------------------------------
+// ----------------      STEP 4: the plane equation for the plate        ------------------------
+// ----------------------------------------------------------------------------------------------
+// - Inputs: The normal unit vector - to get the product
+//           Half the thickness of the plate
+//           (are added to point one)
+// - Determine the x1,y1,and z1 to be used in the plane equation, which are just a coordinate set 
+//   that lies on the plane you want to find the equation of the plane that will be solved for is 
+//   the plane that bisects the plate, since the center point of the plate is what stays on the 
+//   port tube axis
+// ----------------------------------------------------------------------------------------------
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #plane_eqn_DS09up[#num] := #DS09s1up[#num];
+    // DS: 03up
+    #plane_eqn_DS03up[#num] := #DS03s1up[#num];
+    // DS: 12down
+    #plane_eqn_DS12dn[#num] := #DS12s1dn[#num];
+    // DS: 06down
+    #plane_eqn_DS06dn[#num] := #DS06s1dn[#num];
+
+    // TSu: 12up                               
+    #plane_eqn_TSu12up[#num] := #TSu12s1up[#num];
+    // TSu: 06up                               
+    #plane_eqn_TSu06up[#num] := #TSu06s1up[#num];
+    // TSu: 12down                             
+    #plane_eqn_TSu12dn[#num] := #TSu12s1dn[#num];
+    // TSu: 06down                             
+    #plane_eqn_TSu06dn[#num] := #TSu06s1dn[#num];
+
+    // TSd: 12up                                 
+    #plane_eqn_TSd12up[#num] := #TSd12s1up[#num];
+    // TSd: 06up                                 
+    #plane_eqn_TSd06up[#num] := #TSd06s1up[#num];
+    // TSd: 12down                               
+    #plane_eqn_TSd12dn[#num] := #TSd12s1dn[#num];
+    // TSd: 06down                               
+    #plane_eqn_TSd06dn[#num] := #TSd06s1dn[#num];
+END_FOR;
+
+// ----------------------------------------------------------------------------------------------
+// - #plane_eqn_DS09up[3]: finding the value of d in the plane eqn
+// - #plate_t_DS09up:      a temporary value thats needed in order to calculate the point 
+//                         of intersection between a vector and a plane
+// ----------------------------------------------------------------------------------------------
+// DS: 09up
+#plane_eqn_DS09up[3] := (#vector_norm_DS09up[0] * #DS09s1up[0]) + (#vector_norm_DS09up[1] * #DS09s1up[1]) + (#vector_norm_DS09up[2] * #DS09s1up[2]);
+#plate_t_DS09up := ((#vector_norm_DS09up[0] * (#axis_origin[0] - #DS09s1up[0])) + (#vector_norm_DS09up[1] * (#axis_origin[1] - #DS09s1up[1])) + (#vector_norm_DS09up[2] * (#axis_origin[2] - #DS09s1up[2]))) / (-1 * (#vector_norm_DS09up[0] * #vector_axis[0] + #vector_norm_DS09up[1] * #vector_axis[1] + #vector_norm_DS09up[2] * #vector_axis[2]));
+// DS: 03up
+#plane_eqn_DS03up[3] := (#vector_norm_DS03up[0] * #DS03s1up[0]) + (#vector_norm_DS03up[1] * #DS03s1up[1]) + (#vector_norm_DS03up[2] * #DS03s1up[2]);
+#plate_t_DS03up := ((#vector_norm_DS03up[0] * (#axis_origin[0] - #DS03s1up[0])) + (#vector_norm_DS03up[1] * (#axis_origin[1] - #DS03s1up[1])) + (#vector_norm_DS03up[2] * (#axis_origin[2] - #DS03s1up[2]))) / (-1 * (#vector_norm_DS03up[0] * #vector_axis[0] + #vector_norm_DS03up[1] * #vector_axis[1] + #vector_norm_DS03up[2] * #vector_axis[2]));
+// DS: 12down
+#plane_eqn_DS12dn[3] := (#vector_norm_DS12dn[0] * #DS12s1dn[0]) + (#vector_norm_DS12dn[1] * #DS12s1dn[1]) + (#vector_norm_DS12dn[2] * #DS12s1dn[2]);
+#plate_t_DS12dn := ((#vector_norm_DS12dn[0] * (#axis_origin[0] - #DS12s1dn[0])) + (#vector_norm_DS12dn[1] * (#axis_origin[1] - #DS12s1dn[1])) + (#vector_norm_DS12dn[2] * (#axis_origin[2] - #DS12s1dn[2]))) / (-1 * (#vector_norm_DS12dn[0] * #vector_axis[0] + #vector_norm_DS12dn[1] * #vector_axis[1] + #vector_norm_DS12dn[2] * #vector_axis[2]));
+// DS: 06down
+#plane_eqn_DS06dn[3] := (#vector_norm_DS06dn[0] * #DS06s1dn[0]) + (#vector_norm_DS06dn[1] * #DS06s1dn[1]) + (#vector_norm_DS06dn[2] * #DS06s1dn[2]);
+#plate_t_DS06dn := ((#vector_norm_DS06dn[0] * (#axis_origin[0] - #DS06s1dn[0])) + (#vector_norm_DS06dn[1] * (#axis_origin[1] - #DS06s1dn[1])) + (#vector_norm_DS06dn[2] * (#axis_origin[2] - #DS06s1dn[2]))) / (-1 * (#vector_norm_DS06dn[0] * #vector_axis[0] + #vector_norm_DS06dn[1] * #vector_axis[1] + #vector_norm_DS06dn[2] * #vector_axis[2]));
+
+
+// TSu: 12up                                                                                      
+#plane_eqn_TSu12up[3] := (#vector_norm_TSu12up[0] * #TSu12s1up[0]) + (#vector_norm_TSu12up[1] * #TSu12s1up[1]) + (#vector_norm_TSu12up[2] * #TSu12s1up[2]);
+#plate_t_TSu12up := ((#vector_norm_TSu12up[0] * (#axis_origin[0] - #TSu12s1up[0])) + (#vector_norm_TSu12up[1] * (#axis_origin[1] - #TSu12s1up[1])) + (#vector_norm_TSu12up[2] * (#axis_origin[2] - #TSu12s1up[2]))) / (-1 * (#vector_norm_TSu12up[0] * #vector_axis[0] + #vector_norm_TSu12up[1] * #vector_axis[1] + #vector_norm_TSu12up[2] * #vector_axis[2]));
+// TSu: 06up                                                                                      
+#plane_eqn_TSu06up[3] := (#vector_norm_TSu06up[0] * #TSu06s1up[0]) + (#vector_norm_TSu06up[1] * #TSu06s1up[1]) + (#vector_norm_TSu06up[2] * #TSu06s1up[2]);
+#plate_t_TSu06up := ((#vector_norm_TSu06up[0] * (#axis_origin[0] - #TSu06s1up[0])) + (#vector_norm_TSu06up[1] * (#axis_origin[1] - #TSu06s1up[1])) + (#vector_norm_TSu06up[2] * (#axis_origin[2] - #TSu06s1up[2]))) / (-1 * (#vector_norm_TSu06up[0] * #vector_axis[0] + #vector_norm_TSu06up[1] * #vector_axis[1] + #vector_norm_TSu06up[2] * #vector_axis[2]));
+// TSu: 12down                                                                                    
+#plane_eqn_TSu12dn[3] := (#vector_norm_TSu12dn[0] * #TSu12s1dn[0]) + (#vector_norm_TSu12dn[1] * #TSu12s1dn[1]) + (#vector_norm_TSu12dn[2] * #TSu12s1dn[2]);
+#plate_t_TSu12dn := ((#vector_norm_TSu12dn[0] * (#axis_origin[0] - #TSu12s1dn[0])) + (#vector_norm_TSu12dn[1] * (#axis_origin[1] - #TSu12s1dn[1])) + (#vector_norm_TSu12dn[2] * (#axis_origin[2] - #TSu12s1dn[2]))) / (-1 * (#vector_norm_TSu12dn[0] * #vector_axis[0] + #vector_norm_TSu12dn[1] * #vector_axis[1] + #vector_norm_TSu12dn[2] * #vector_axis[2]));
+// TSu: 06down                                                                                    
+#plane_eqn_TSu06dn[3] := (#vector_norm_TSu06dn[0] * #TSu06s1dn[0]) + (#vector_norm_TSu06dn[1] * #TSu06s1dn[1]) + (#vector_norm_TSu06dn[2] * #TSu06s1dn[2]);
+#plate_t_TSu06dn := ((#vector_norm_TSu06dn[0] * (#axis_origin[0] - #TSu06s1dn[0])) + (#vector_norm_TSu06dn[1] * (#axis_origin[1] - #TSu06s1dn[1])) + (#vector_norm_TSu06dn[2] * (#axis_origin[2] - #TSu06s1dn[2]))) / (-1 * (#vector_norm_TSu06dn[0] * #vector_axis[0] + #vector_norm_TSu06dn[1] * #vector_axis[1] + #vector_norm_TSu06dn[2] * #vector_axis[2]));
+
+
+// TSd: 12up                                                                                                                      
+#plane_eqn_TSd12up[3] := (#vector_norm_TSd12up[0] * #TSd12s1up[0]) + (#vector_norm_TSd12up[1] * #TSd12s1up[1]) + (#vector_norm_TSd12up[2] * #TSd12s1up[2]); 
+#plate_t_TSd12up := ((#vector_norm_TSd12up[0] * (#axis_origin[0] - #TSd12s1up[0])) + (#vector_norm_TSu12up[1] * (#axis_origin[1] - #TSd12s1up[1])) +                  (#vector_norm_TSd12up[2] * (#axis_origin[2] - #TSd12s1up[2]))) / (-1 * (#vector_norm_TSd12up[0] * #vector_axis[0] + #vector_norm_TSd12up[1] * #vector_axis[1] +       #vector_norm_TSd12up[2] * #vector_axis[2]));
+// TSd: 06up                                                                                                                      
+#plane_eqn_TSd06up[3] := (#vector_norm_TSd06up[0] * #TSd06s1up[0]) + (#vector_norm_TSd06up[1] * #TSd06s1up[1]) + (#vector_norm_TSd06up[2] * #TSd06s1up[2]); 
+#plate_t_TSd06up := ((#vector_norm_TSd06up[0] * (#axis_origin[0] - #TSd06s1up[0])) + (#vector_norm_TSu06up[1] * (#axis_origin[1] - #TSd06s1up[1])) +                  (#vector_norm_TSd06up[2] * (#axis_origin[2] - #TSd06s1up[2]))) / (-1 * (#vector_norm_TSd06up[0] * #vector_axis[0] + #vector_norm_TSd06up[1] * #vector_axis[1] +       #vector_norm_TSd06up[2] * #vector_axis[2]));
+// TSd: 12down                                                                                                                    
+#plane_eqn_TSd12dn[3] := (#vector_norm_TSd12dn[0] * #TSd12s1dn[0]) + (#vector_norm_TSd12dn[1] * #TSd12s1dn[1]) + (#vector_norm_TSd12dn[2] * #TSd12s1dn[2]);
+#plate_t_TSd12dn := ((#vector_norm_TSd12dn[0] * (#axis_origin[0] - #TSd12s1dn[0])) + (#vector_norm_TSu12dn[1] * (#axis_origin[1] - #TSd12s1dn[1])) +                  (#vector_norm_TSd12dn[2] * (#axis_origin[2] - #TSd12s1dn[2]))) / (-1 * (#vector_norm_TSd12dn[0] * #vector_axis[0] + #vector_norm_TSd12dn[1] * #vector_axis[1] +       #vector_norm_TSd12dn[2] * #vector_axis[2]));
+// TSd: 06down                                                                                                                    
+#plane_eqn_TSd06dn[3] := (#vector_norm_TSd06dn[0] * #TSd06s1dn[0]) + (#vector_norm_TSd06dn[1] * #TSd06s1dn[1]) + (#vector_norm_TSd06dn[2] * #TSd06s1dn[2]);
+#plate_t_TSd06dn := ((#vector_norm_TSd06dn[0] * (#axis_origin[0] - #TSd06s1dn[0])) + (#vector_norm_TSd06dn[1] * (#axis_origin[1] - #TSd06s1dn[1])) +                  (#vector_norm_TSd06dn[2] * (#axis_origin[2] - #TSd06s1dn[2]))) / (-1 * (#vector_norm_TSd06dn[0] * #vector_axis[0] + #vector_norm_TSd06dn[1] * #vector_axis[1] +       #vector_norm_TSd06dn[2] * #vector_axis[2]));
+
+// ----------------------------------------------------------------------------------------------
+// - calculating the coordinate for the center of the plate
+// ----------------------------------------------------------------------------------------------
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #plate_center_DS09up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_DS09up;
+    // DS: 03up
+    #plate_center_DS03up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_DS03up;
+    // DS: 12down
+    #plate_center_DS12dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_DS12dn;
+    // DS: 06down
+    #plate_center_DS06dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_DS06dn;
+
+    // TSu: 12up                                                                             
+    #plate_center_TSu12up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSu12up;
+    // TSu: 06up                                                                             
+    #plate_center_TSu06up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSu06up;
+    // TSu: 12down                                                                           
+    #plate_center_TSu12dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSu12dn;
+    // TSu: 06down                                                                           
+    #plate_center_TSu06dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSu06dn;
+
+    // TSu: 12up                                                                             
+    #plate_center_TSd12up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSd12up;
+    // TSu: 06up                                                                             
+    #plate_center_TSd06up[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSd06up;
+    // TSu: 12down                                                                           
+    #plate_center_TSd12dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSd12dn;
+    // TSu: 06down                                                                           
+    #plate_center_TSd06dn[#num] := #axis_origin[#num] + #vector_axis[#num] * #plate_t_TSd06dn;
+END_FOR;
+
+
+// -----------------------------------------------------------------------------------------
+// --------------------          STEP 5: Cold Mass position        -------------------------
+// -----------------------------------------------------------------------------------------
+// - Inputs: the normal unit vector
+//           the length of rod and plate (adding it to the point at the center of the plate)
+// -----------------------------------------------------------------------------------------
+#num := 0;
+FOR #num := 0 TO 2 DO
+    // DS: 09up
+    #coldmass_DS09up[#num] := #plate_center_DS09up[#num] + #vector_norm_DS09up[#num] * #rodlength_DS09up;
+    // DS: 03up
+    #coldmass_DS03up[#num] := #plate_center_DS03up[#num] + #vector_norm_DS03up[#num] * #rodlength_DS03up;
+    // DS: 12down
+    #coldmass_DS12dn[#num] := #plate_center_DS12dn[#num] + #vector_norm_DS12dn[#num] * #rodlength_DS12dn;
+    // DS: 06down
+    #coldmass_DS06dn[#num] := #plate_center_DS06dn[#num] + #vector_norm_DS06dn[#num] * #rodlength_DS06dn;
+
+    // TSu: 12up     
+    #coldmass_TSu12up[#num] := #plate_center_TSu12up[#num] + #vector_norm_TSu12up[#num] * #rodlength_TSu12up;
+    // TSu: 06up     
+    #coldmass_TSu06up[#num] := #plate_center_TSu06up[#num] + #vector_norm_TSu06up[#num] * #rodlength_TSu06up;
+    // TSu: 12down   
+    #coldmass_TSu12dn[#num] := #plate_center_TSu12dn[#num] + #vector_norm_TSu12dn[#num] * #rodlength_TSu12dn;
+    // TSu: 06down   
+    #coldmass_TSu06dn[#num] := #plate_center_TSu06dn[#num] + #vector_norm_TSu06dn[#num] * #rodlength_TSu06dn;
+
+    // TSd: 12up                                                                                         
+    #coldmass_TSd12up[#num] := #plate_center_TSd12up[#num] + #vector_norm_TSd12up[#num] * #rodlength_TSd12up;
+    // TSd: 06up                                                                                         
+    #coldmass_TSd06up[#num] := #plate_center_TSd06up[#num] + #vector_norm_TSd06up[#num] * #rodlength_TSd06up;
+    // TSd: 12down                                                                                       
+    #coldmass_TSd12dn[#num] := #plate_center_TSd12dn[#num] + #vector_norm_TSd12dn[#num] * #rodlength_TSd12dn;
+    // TSd: 06down                                                                                       
+    #coldmass_TSd06dn[#num] := #plate_center_TSd06dn[#num] + #vector_norm_TSd06dn[#num] * #rodlength_TSd06dn;
+END_FOR;
