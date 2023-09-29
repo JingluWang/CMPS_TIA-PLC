@@ -3,7 +3,8 @@
 ### file location
 C:\PLC for CMPS\2023_New_Testing\Full_CMPS_3Boxeswork\Full_CMPS_3Boxeswork \
 -> folder: CMPS_PLC \[CPU 1212C AC/DC/Rly\] 
-   
+
+### Editing
 1. Program blocks
  - Main \[OB1\]
 ![main](https://github.com/JingluWang/CMPS_TIA-PLC/assets/107279970/dbdb571e-4975-40a0-8d72-da22e7a8d3a7)
@@ -24,7 +25,7 @@ C:\PLC for CMPS\2023_New_Testing\Full_CMPS_3Boxeswork\Full_CMPS_3Boxeswork \
 
 
 
-> Run:
+### Running
 > - Compile (Right click on any modified block: only changed or all)
 > - Download to device
 > - Go Online
@@ -34,7 +35,8 @@ C:\PLC for CMPS\2023_New_Testing\Full_CMPS_3Boxeswork\Full_CMPS_3Boxeswork \
 
 
 
-## Calibration
+## Calibration for Cold Mass Position (CMP)
+Example: DS_03up
 
 |                               | on prototype | \[0\] (x) | \[1\] (z) | \[2\] (y) | 
 |   ---                         | ---          | ---       | ---       | ---       |
