@@ -35,7 +35,7 @@ C:\PLC for CMPS\2023_New_Testing\Full_CMPS_3Boxeswork\Full_CMPS_3Boxeswork \
 
 
 
-## Calibration for Cold Mass Position (CMP)
+## Calibration for Cold Mass Position System (CMPS)
 Example: DS_03up
 
 |                               | on prototype | \[0\] (x) | \[1\] (z) | \[2\] (y) | 
